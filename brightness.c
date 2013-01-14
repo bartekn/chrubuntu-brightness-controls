@@ -23,7 +23,17 @@ int main(int argc, char **argv) {
     printf("FAILED to open file (%d, %d).\n", 0, errno);
     return -1;
   }
-  
+
+#ifdef BRIGHTNESS_SET
+  if (argc < 1)
+  {
+    printf("Missing argument (brightness value).\n");
+    fclose(fp);
+    return -4;
+  }
+
+  brightness = atoi(argv[1]);
+#else
   read = fread(brightness_string, 1, 4, fp);
   if (read > 4) {
     printf("FAILED to read file (%d, %d).\n", read, errno);
@@ -32,13 +42,15 @@ int main(int argc, char **argv) {
   }
 
   brightness = atoi(brightness_string);
+  brightness += INCREMENT;
+#endif
+
   if (brightness < 0 || brightness > 255) {
     printf("Unexpected brightness value: %d.\n", brightness);
     fclose(fp);
     return -3;
   }
 
-  brightness += INCREMENT;
   if (brightness > 255) {
     brightness = 255;
   }
